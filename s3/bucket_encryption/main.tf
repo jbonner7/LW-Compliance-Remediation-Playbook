@@ -8,14 +8,12 @@ terraform {
 }
 
 provider "aws" {
-  # Configuration options
+# Configuration options
 resource "aws_organizations_policy" "s3_scp_bucket_encryption" {
-  name = "s3_scp_bucket_encryption"
-  content = <<CONTENT
+ name = "s3_scp_bucket_encryption"
+ content = <<CONTENT
+
 {
-    "Version": "2012-10-17",
-    "Statement": [
-        {
             "Action": [
                 "s3:PutObject"
             ],
@@ -26,8 +24,8 @@ resource "aws_organizations_policy" "s3_scp_bucket_encryption" {
                     "s3:x-amz-server-side-encryption": "AES256"
                 }
             }
-        },
-        {
+       },
+       {
             "Action": [
                 "s3:PutObject"
             ],
@@ -37,9 +35,8 @@ resource "aws_organizations_policy" "s3_scp_bucket_encryption" {
                 "Bool": {
                     "s3:x-amz-server-side-encryption": false
                 }
+
             }
         }
-    ]
-  } 
- }
+    }
 }
