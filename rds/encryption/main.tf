@@ -13,6 +13,7 @@ provider "aws" {
   # Configuration options
 resource "aws_organizations_policy" "rds_scp_db_encryption" {
   name = "rds_scp_db_encryption"
+  description = "This SCP prevents users or roles from creating non-encrypted RDS instances."
   content = <<CONTENT
 
 {
