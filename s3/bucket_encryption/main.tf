@@ -7,32 +7,39 @@ terraform {
   }
 }
 
-terraform {
-  required_providers {
-    aws = {
-      source = "hashicorp/aws"
-      version = "4.6.0"
-    }
-  }
-}
-resource "aws_organizations_policy" "scp" {
-  name = "scp_s3"
-  description = "This SCP prevents users or roles in any affected account from deleting any S3 bucket or objects. "
-  content = <<POLICY
+provider "aws" {
+  # Configuration options
+resource "aws_organizations_policy" "s3_scp_bucket_encryption" {
+  name = "s3_scp_bucket_encryption"
+  content = <<CONTENT
 {
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Sid": "DenyS3DeleteWhenMFAIsNotPresent",
-      "Effect": "Deny",
-      "Action": [
-        "s3:DeleteBucket",
-        "s3:DeleteObject",
-        "s3:DeleteObjectVersion"
-      ],
-      "Resource": "*",
-      "Condition": {"BoolIfExists": {"aws:MultiFactorAuthPresent": false}}
-    }
-  ]
- }  
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "*",
+            "Effect": "Deny",
+            "Condition": {
+                "StringNotEquals": {
+                    "s3:x-amz-server-side-encryption": "AES256"
+                }
+            }
+        },
+        {
+            "Action": [
+                "s3:PutObject"
+            ],
+            "Resource": "*",
+            "Effect": "Deny",
+            "Condition": {
+                "Bool": {
+                    "s3:x-amz-server-side-encryption": false
+                }
+            }
+        }
+    ]
+  } 
+ }
 }
