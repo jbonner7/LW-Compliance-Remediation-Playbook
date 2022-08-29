@@ -1,0 +1,32 @@
+### LQL Query to identify violations on S3 buckets for rules LW_S3_1 through LW_S3_10
+---
+queryId: ch_lw_s3_bucket_public_rwl
+queryText: |-
+  {
+    source {
+        LW_CFG_AWS_S3 bucket
+        with LW_CFG_AWS_S3_GET_BUCKET_ACL acl,
+        array_to_rows(acl.RESOURCE_CONFIG:Grants) as (grants)
+    }
+    filter {
+        grants:Grantee.URI in (
+            'http://acs.amazonaws.com/groups/global/AllUsers',
+            'http://acs.amazonaws.com/groups/global/AuthenticatedUsers'
+        )
+        and grants:Permission in (
+            'FULL_CONTROL',
+            'READ',
+            'READ_ACP',
+            'WRITE',
+            'WRITE_ACP'
+        )
+    }
+    return distinct {
+        bucket.ACCOUNT_ALIAS,
+        bucket.ACCOUNT_ID,
+        bucket.ARN as RESOURCE_KEY,
+        bucket.RESOURCE_REGION,
+        bucket.RESOURCE_TYPE,
+        bucket.SERVICE
+    }
+  }
