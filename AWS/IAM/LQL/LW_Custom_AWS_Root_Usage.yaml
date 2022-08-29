@@ -1,0 +1,23 @@
+#Use this LQL query to return information on active root accounts
+
+---
+evaluatorId: Cloudtrail                                                                                                                                               
+queryId: LW_Custom_AWS_Root_Usage                                                                                                           
+queryText: |-                                                                                                                                                         
+  LW_Custom_AWS_Root_Usage {       
+    source {
+        CloudTrailRawEvents
+    }
+    filter {
+        upper(EVENT:userIdentity."type"::String) = 'ROOT'
+        and not value_exists(EVENT:userIdentity.invokedBy)
+        and EVENT:eventType::String <> 'AwsServiceEvent'
+        and ERROR_CODE is null
+    }
+    return distinct {
+        INSERT_ID,
+        INSERT_TIME,
+        EVENT_TIME,
+        EVENT
+        }
+    }
